@@ -1,0 +1,26 @@
+# --- Rdzeń LLM SDK ---
+openai>=1.40
+anthropic>=0.34
+python-dotenv>=1.0
+pydantic>=2.7
+
+# --- LangChain (laby 1–5; agenci create_agent wymagają LangChain >= 1.0) ---
+langchain>=1.0
+langchain-openai>=0.2
+langchain-community>=0.3
+langchain-text-splitters>=0.3
+langsmith>=0.1
+
+# --- RAG: baza wektorowa i embeddingi (lab 3) ---
+chromadb>=0.5
+faiss-cpu>=1.8
+tiktoken>=0.7
+pypdf>=4.2
+
+# --- Frameworki UI/API (opcjonalnie, sekcja Frameworki) ---
+streamlit>=1.36
+fastapi>=0.110
+uvicorn>=0.29
+
+# --- Odporność (lab 2 i 4) ---
+tenacity>=8.3

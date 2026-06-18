@@ -1,0 +1,77 @@
+LangChain — Podstawy i zastosowania
+
+LangChain to framework open-source do budowania aplikacji opartych na dużych modelach językowych (LLM). Udostępnia abstrakcje do łączenia modeli, promptów, baz wektorowych i narzędzi w jeden spójny pipeline.
+
+Główne komponenty LangChain to: modele językowe (chat i completion), szablony promptów (ChatPromptTemplate, PromptTemplate), parsery wyjścia (StrOutputParser, PydanticOutputParser), łańcuchy LCEL (operatorem |), retrievery i bazy wektorowe, a także agenci z narzędziami.
+
+LangChain Expression Language (LCEL) to sposób łączenia komponentów przez operator |. Przykład: chain = prompt | model | parser. Wywołanie chain.invoke({"temat": "RAG"}) przepuszcza dane przez wszystkie etapy po kolei.
+
+---
+
+RAG — Retrieval-Augmented Generation
+
+RAG to wzorzec architektoniczny, w którym model LLM generuje odpowiedzi na podstawie fragmentów pobranych z zewnętrznej bazy wiedzy, a nie wyłącznie z danych treningowych.
+
+Etapy RAG: wczytanie dokumentów, podział na chunki, generowanie embeddingów, przechowywanie w bazie wektorowej, wyszukiwanie podobnych fragmentów na podstawie pytania, budowanie promptu z kontekstem, generowanie odpowiedzi przez LLM.
+
+RAG pozwala na aktualizację bazy wiedzy bez ponownego trenowania modelu. Odpowiedzi są ugruntowane w konkretnych dokumentach, co ogranicza halucynacje. Możliwe jest cytowanie źródeł.
+
+---
+
+ChromaDB — lokalna baza wektorowa
+
+ChromaDB to otwartoźródłowa baza wektorowa napisana w Pythonie. Działa lokalnie bez potrzeby instalacji osobnego serwera. Dane można przechowywać w pamięci (in-memory) lub zapisywać na dysk (persist_directory).
+
+Chroma przechowuje dokumenty, ich embeddingi oraz metadane. Udostępnia wyszukiwanie podobieństwa (similarity search) oraz wyszukiwanie MMR (Maximum Marginal Relevance), które zwraca różnorodniejsze wyniki.
+
+Integracja z LangChain: from langchain_community.vectorstores import Chroma. Aby zaindeksować dokumenty: Chroma.from_documents(documents, embedding, persist_directory="./db"). Aby wczytać istniejącą bazę: Chroma(persist_directory="./db", embedding_function=embedding).
+
+---
+
+Embeddingi — reprezentacje wektorowe
+
+Embeddingi to wektory liczb reprezentujące semantyczne znaczenie tekstu. Dwa teksty o podobnym znaczeniu mają embeddingi bliskie sobie w przestrzeni wektorowej.
+
+OpenAI udostępnia model text-embedding-3-small i text-embedding-3-large. Mniejszy model jest szybszy i tańszy, większy — dokładniejszy. W LangChain używamy: from langchain_openai import OpenAIEmbeddings.
+
+Embeddingi są obliczane raz podczas indeksowania i zapisywane w bazie wektorowej. Przy zapytaniu obliczany jest embedding pytania i porównywany z zapisanymi wektorami przez cosine similarity lub dot product.
+
+---
+
+RecursiveCharacterTextSplitter — dzielenie tekstu
+
+RecursiveCharacterTextSplitter dzieli tekst rekurencyjnie: najpierw po podwójnym znaku nowej linii, potem po pojedynczym, potem po spacji, potem po znakach.
+
+Parametr chunk_size określa maksymalną liczbę znaków w jednym fragmencie. Parametr chunk_overlap określa, ile znaków dzielą ze sobą sąsiednie fragmenty — dzięki temu kontekst na granicach chunków nie jest urwany.
+
+Dobra wartość chunk_size to 300–1000 znaków w zależności od treści. chunk_overlap na poziomie 10–20% chunk_size to dobry punkt startowy. Chunki z nagłówkami tematycznymi działają lepiej niż chunki w środku zdania.
+
+---
+
+Prompt systemowy w RAG
+
+Kluczowym elementem RAG jest instrukcja systemowa, która mówi modelowi, żeby odpowiadał wyłącznie na podstawie podanego kontekstu.
+
+Dobry prompt systemowy: "Jesteś pomocnym asystentem. Odpowiadaj wyłącznie na podstawie podanego kontekstu. Jeśli odpowiedź nie wynika z kontekstu, powiedz że nie wiesz i nie próbuj zgadywać."
+
+Taka instrukcja ogranicza halucynacje — sytuacje, gdy model generuje wiarygodnie brzmiące, ale błędne informacje spoza bazy wiedzy.
+
+Kontekst w prompcie powinien zawierać metadane źródła, żeby model mógł się powołać na konkretny dokument.
+
+---
+
+FastAPI i LangChain
+
+FastAPI to nowoczesny framework do budowania REST API w Pythonie. Kombinacja FastAPI i LangChain pozwala wystawić pipeline RAG jako usługę HTTP.
+
+Endpoint POST przyjmuje pytanie użytkownika w ciele requestu (Pydantic BaseModel), wywołuje łańcuch RAG i zwraca odpowiedź wraz z metadanymi źródeł.
+
+Zaletą takiego rozwiązania jest to, że frontend lub inna usługa może korzystać z RAG przez prosty REST API bez dostępu do kodu Pythona.
+
+---
+
+Streamlit i RAG
+
+Streamlit pozwala na bardzo szybkie zbudowanie interfejsu użytkownika dla systemu RAG. Aplikacja czatowa z RAG w Streamlit: st.chat_input przyjmuje pytanie, chain.invoke zwraca odpowiedź, st.session_state przechowuje historię rozmowy.
+
+Dodatkowa funkcja: wyświetlanie użytych źródeł pod odpowiedzią — retriever.invoke zwraca listę dokumentów z metadanymi, które można wypisać jako expander w Streamlit.
