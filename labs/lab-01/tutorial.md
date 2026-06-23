@@ -124,6 +124,100 @@ print(response.content)
 
 ---
 
+## 3.1 Metody tworzenia szablonów: `from_template()` i `from_messages()`
+
+`ChatPromptTemplate` oferuje dwie główne metody tworzenia szablonów. Warto znać obie, bo służą do różnych celów.
+
+### `from_template()` — szybka i prosta
+
+Gdy chcesz prostą instrukcję z kilkoma zmiennymi:
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+prompt = ChatPromptTemplate.from_template(
+    "Wyjaśnij {concept} w kontekście {context}. Bądź zwięzły."
+)
+
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0.3)
+
+messages = prompt.invoke({
+    "concept": "API REST",
+    "context": "szkolenie dla junior developerów"
+})
+
+response = model.invoke(messages)
+print(response.content)
+```
+
+**Zalety:**
+- bardzo krótko się pisze,
+- idealna do jednoliniowych czy dwuliniowych promptów,
+- zmienne wstawiasz jako `{placeholder}`.
+
+**Ograniczenia:**
+- cała treść trafia jako rola `human` (użytkownika),
+- brak jawnej separacji systemu i użytkownika.
+
+### `from_messages()` — pełna kontrola
+
+Gdy potrzebujesz niezależnych ról systemu, asystenta czy użytkownika:
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "Jesteś mentorem programowania. Zawsze podawaj konkretne przykłady kodu."),
+    ("human", "Wyjaśnij mi {concept} w kategorii {difficulty}. Podaj mały example."),
+])
+
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
+
+messages = prompt.invoke({
+    "concept": "lambda funkcje",
+    "difficulty": "zaawansowane"
+})
+
+response = model.invoke(messages)
+print(response.content)
+```
+
+**Zalety:**
+- pełna kontrola nad rolą każdej wiadomości,
+- możesz dodać wiele ról (`system`, `human`, `ai`),
+- łatwiej jest konstruować złożone instrukcje.
+
+### Porównanie side-by-side
+
+```python
+# from_template() — jednolinijkowa, tylko human
+prompt_simple = ChatPromptTemplate.from_template(
+    "Opowiedz o {topic}"
+)
+
+# from_messages() — bardziej elastyczna
+prompt_complex = ChatPromptTemplate.from_messages([
+    ("system", "Jesteś ekspertem"),
+    ("human", "Opowiedz o {topic}"),
+])
+
+# Oba działają z invoke(), ale strukturalnie się różnią
+```
+
+### Kiedy stosować co?
+
+| Sytuacja | Metoda | Dlaczego |
+|----------|--------|---------|
+| Prosty prompt, 1 zmienna | `from_template()` | szybciej się pisze |
+| Potrzebujesz system prompt | `from_messages()` | możesz ustawić rolę |
+| Złożona instrukcja, wiele zmiennych | `from_messages()` | pełna kontrola |
+| Prototyp, uczę się | `from_template()` | łatwiej początkować |
+| Produkcja, precyzyjne zachowanie | `from_messages()` | jawna separacja ról |
+
+---
+
 ## 4. Pierwszy łańcuch LCEL
 
 W LangChain bardzo wygodnie buduje się przepływ danych przez operator `|`.
