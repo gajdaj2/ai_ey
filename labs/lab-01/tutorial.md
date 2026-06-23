@@ -278,6 +278,56 @@ print(result)
 
 To jeszcze nie jest pełna walidacja struktury, ale już znacząco poprawia przewidywalność odpowiedzi.
 
+### Wersja z walidacją przez `Pydantic`
+
+Jeżeli chcesz **wymusić konkretną strukturę** i od razu dostać wynik jako obiekt Pydantic, użyj `PydanticOutputParser`.
+
+```python
+from pydantic import BaseModel, Field
+from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+
+class LessonCard(BaseModel):
+    tytul: str = Field(description="Krótki tytuł lekcji")
+    opis: str = Field(description="Opis w maksymalnie 2 zdaniach")
+    poziom: str = Field(description="Poziom trudności: niski/sredni/wysoki")
+
+
+parser = PydanticOutputParser(pydantic_object=LessonCard)
+
+prompt = ChatPromptTemplate.from_template(
+    """
+    Odpowiedz na temat: {topic}
+
+    {format_instructions}
+    """,
+    partial_variables={"format_instructions": parser.get_format_instructions()},
+)
+
+chain = (
+    prompt
+    | ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    | parser
+)
+
+result = chain.invoke({"topic": "wprowadzenie do LangChain"})
+
+print(type(result))         # <class '__main__.LessonCard'>
+print(result.tytul)
+print(result.opis)
+print(result.poziom)
+```
+
+W tym podejściu:
+
+- model dostaje jawne instrukcje formatu (`parser.get_format_instructions()`),
+- odpowiedź jest parsowana do klasy `LessonCard`,
+- od razu masz walidację typów i pól.
+
+To jest pierwszy krok do stabilnych integracji API, gdzie frontend lub inny serwis oczekuje przewidywalnego JSON-a.
+
 ---
 
 ## 6. Mini-przykład: generator mikro-lekcji
