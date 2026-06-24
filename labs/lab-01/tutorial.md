@@ -1,5 +1,7 @@
 # Lab 01 — Podstawy LangChain z OpenAI
 
+> Jeśli zaczynasz od podstaw Pythona, najpierw przejdź przez `tutorial-python.md` oraz ćwiczenia z folderu `cwiczenia-python/`.
+
 ## Cel labu
 
 W tym labie poznasz absolutne podstawy pracy z biblioteką **LangChain** i modelem **OpenAI** w Pythonie. Po wykonaniu tutorialu uczestnik powinien umieć:

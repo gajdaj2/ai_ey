@@ -1,5 +1,7 @@
 # Lab 01 — Ćwiczenia
 
+> Te ćwiczenia dotyczą części LangChain. Jeśli potrzebujesz fundamentów Pythona, zacznij od `tutorial-python.md` i folderu `cwiczenia-python/`.
+
 ## Jak pracować z ćwiczeniami
 
 Najlepiej wykonuj zadania po kolei. Każde kolejne rozwija poprzednie. Jeśli prowadzisz szkolenie, możesz potraktować sekcje 1–4 jako obowiązkowe, a 5–7 jako rozszerzenie.
