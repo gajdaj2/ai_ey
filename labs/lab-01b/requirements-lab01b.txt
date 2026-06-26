@@ -1,0 +1,23 @@
+# Lab 01b — Zależności dla Ollama + LangChain
+
+# Podstawowe LangChain
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-community>=0.0.1
+
+# Community integration dla Ollama
+# (już zawarte w langchain-community)
+
+# Do strukturyzowanego outputu
+pydantic>=2.0
+
+# Opcional: dla lepszego outputu
+colorama>=0.4.6
+
+# Opcional: dla ćwiczenia 9 (FastAPI)
+# fastapi>=0.104.0
+# uvicorn>=0.24.0
+
+# Opcional: dla eksperymentów
+# requests>=2.31.0
+# python-dotenv>=1.0.0
